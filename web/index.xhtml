@@ -1,0 +1,73 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+<h:head>
+
+    <title><ui:insert name="title">AutoCompletion</ui:insert></title>
+
+</h:head>
+
+<h:body>
+
+    <h:form id="form">
+        <p:growl id="messages" />
+        <p:commandButton value="#{testController.message}" actionListener="#{testController.onClick}"
+                         update="@form"/>
+
+        <h:form>
+            <p:dataTable widgetVar="table"
+                         var="data"
+                         value="#{testController.table1List}"
+                         selection = "#{testController.selected}"
+                         selectionMode="single"
+                         rowKey="#{data.id}"
+                         rendered="#{testController.visible}"
+                         >
+
+                <p:ajax event="rowSelect"
+                        listener="#{testController.addMessage('Пользователь выбран!')}"
+                        update=":form:messages, :form:basicDialog"
+                        oncomplete="dlg.show();"/>
+
+
+                <p:column headerText="id" style="width:10%">
+                    <h:outputText value="#{data.id}" />
+                </p:column>
+                <p:column headerText="name" style="width:25%">
+                    <h:outputText value="#{data.name}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+
+    <p:dialog id="basicDialog" header="Выбрать товары" widgetVar="dlg" width="300" height="150">
+    <h:form>
+        <h:panelGrid columns="1">
+           <p:inputText value="#{testController.selected.id}" readonly="true"/>
+             <p:autoComplete  id="usersname"
+                              value="#{testController.newValue}"
+                              completeMethod="#{testController.completeUsersStr}"
+                              var="p" itemLabel="#{p}" itemValue="#{p}"
+                               forceSelection="false">
+                 <p:ajax event="change"
+                         listener="#{testController.saveUser()}" update=":form:messages" />
+                 <p:ajax event="itemSelect"
+                         listener="#{testController.saveUser()}" update=":form:messages" />
+             </p:autoComplete>
+         </h:panelGrid>
+            <p:commandButton value="Сохранить"
+                             process="@this"
+                             action="#{testController.saveUser()}"
+                             update=":form:messages"
+                             onclick="dlg.hide();"/>
+
+    </h:form>
+    </p:dialog>
+    </h:form>
+
+
+</h:body>
+</html>
